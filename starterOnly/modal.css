@@ -184,6 +184,7 @@ main {
 }
 
 .modal-body {
+  position: relative;
   padding: 15px 8%;
   margin: 15px auto;
 }
@@ -478,6 +479,39 @@ footer {
   padding-right: 2vw;
   margin: 0 20px;
 }
+
+#confirmation[hidden] { 
+  display: none !important; 
+}
+
+#confirmation {
+  position: absolute;
+  inset: 0;
+  display: none;             
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1;                 
+}
+
+#confirmation.is-visible { 
+  display: flex; 
+  flex-direction: column;
+}
+
+#confirmation-btn-close{
+  position: absolute;
+    bottom: 2px;
+}
+
+.close { z-index: 3; }
+
+#confirmation h1 {
+  text-align: center;
+  font-size: 36px;
+  max-width: 272px;         
+}
+
 @media screen and (max-width: 800px) {
   .hero-section {
     display: block;

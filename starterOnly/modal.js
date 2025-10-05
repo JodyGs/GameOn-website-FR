@@ -1,9 +1,3 @@
-// TODO: Remonter erreur CGU
-// Validateur HTML
-// Modale validée
-// Version mobile front
-// reset sur buttonClose
-
 function editNav() {
   var x = document.getElementById("myTopnav");
   if (x.className === "topnav") {
@@ -17,6 +11,10 @@ function editNav() {
 const modalbg = document.querySelector(".bground");
 const modalBtn = document.querySelectorAll(".modal-btn");
 const closeBtn = document.querySelector(".close");
+const confirmationBox = document.getElementById("confirmation");
+const modalBody = document.querySelector(".modal-body");
+if (confirmationBox) confirmationBox.classList.remove("is-visible");
+
 
 // launch modal event
 modalBtn.forEach((btn) =>
@@ -25,7 +23,18 @@ modalBtn.forEach((btn) =>
 
 // launch modal form
 function launchModal() {
+  // État initial propre
+  if (form) form.hidden = false;
+  if (confirmationBox) confirmationBox.classList.remove("is-visible");
+  if (modalBody) modalBody.style.minHeight = "";
+
   modalbg.style.display = "block";
+
+  requestAnimationFrame(() => {
+    if (!modalBody) return;
+    const h = modalBody.offsetHeight;
+    if (h > 0) modalBody.style.minHeight = h + "px";
+  });
 }
 
 
@@ -33,15 +42,17 @@ function launchModal() {
  * Modale
  */
 
-if (closeBtn) {
-  closeBtn.addEventListener("click", () => {
-    modalbg.style.display = "none";
+if (closeBtn && !closeBtn._bound) {
+  closeBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeModalAndReset();
   });
+  closeBtn._bound = true;
 }
 
 window.addEventListener("click", (e) => {
   if (e.target === modalbg) {
-    modalbg.style.display = "none";
+    closeModalAndReset(); 
   }
 });
 
@@ -148,46 +159,33 @@ if (form) {
   /** 
    * Confirmation
    */
-  const modalBody = document.querySelector(".modal-body");
-  let confirmationBox = document.querySelector(".confirmation-message");
-
-  if (!confirmationBox && modalBody) {
-    confirmationBox = document.createElement("div");
-    confirmationBox.className = "confirmation-message";
-    confirmationBox.style.display = "none";
-    confirmationBox.style.textAlign = "center";
-    confirmationBox.style.padding = "20px";
-    confirmationBox.innerHTML = `
-      <h2>Merci ! Votre réservation a été reçue.</h2>
-      <p>Nous vous contacterons bientôt avec plus de détails.</p>
-      <div style="margin-top:20px;">
-        <button id="confirm-close" class="btn-submit" >Fermer</button>
-      </div>
-    `;
-    modalBody.appendChild(confirmationBox);
-  }
 
   function closeModalAndReset() {
-    modalbg.style.display = "none";
-    form.reset();
+  modalbg.style.display = "none";
+  if (!form) return;
 
-    const fields = ["first", "last", "email", "quantity", "birthdate"]
-      .map((n) => form[n])
-      .filter(Boolean);
-    fields.forEach(clearError);
+  form.reset();
 
-    const radios = form.querySelectorAll('input[name="location"]');
-    const radioGroupWrap = radios[0]?.closest(".formData");
-    if (radioGroupWrap) {
-      radioGroupWrap.removeAttribute("data-error");
-      radioGroupWrap.removeAttribute("data-error-visible");
-    }
-    const cgu = document.getElementById("checkbox1");
-    if (cgu) clearError(cgu);
+  // Nettoie les erreurs
+  const fields = ["first", "last", "email", "quantity", "birthdate"]
+    .map((n) => form[n])
+    .filter(Boolean);
+  fields.forEach(clearError);
 
-    form.style.display = "block";
-    if (confirmationBox) confirmationBox.style.display = "none";
+  const radios = form.querySelectorAll('input[name="location"]');
+  const radioGroupWrap = radios[0]?.closest(".formData");
+  if (radioGroupWrap) {
+    radioGroupWrap.removeAttribute("data-error");
+    radioGroupWrap.removeAttribute("data-error-visible");
   }
+  const cgu = document.getElementById("checkbox1");
+  if (cgu) clearError(cgu);
+
+  // Rétablit l'état visuel
+  form.hidden = false;
+  if (confirmationBox) confirmationBox.classList.remove("is-visible");
+  if (modalBody) modalBody.style.minHeight = "";
+}
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && modalbg.style.display === "block") {
@@ -198,17 +196,14 @@ document.addEventListener("keydown", (e) => {
   
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const ok = validate();
+    if (!validate()) return;
 
-    if (!ok) return;
-
-    // Confirmation
-    form.style.display = "none";
+    form.hidden = true;
     if (confirmationBox) {
-      confirmationBox.style.display = "block";
+      confirmationBox.classList.add("is-visible");
 
-      const btnClose = confirmationBox.querySelector("#confirm-close");
-
+      // Bouton "Fermer" dans la confirmation
+      const btnClose = document.getElementById("confirmation-btn-close");
       if (btnClose && !btnClose._bound) {
         btnClose.addEventListener("click", (ev) => {
           ev.preventDefault();
@@ -218,6 +213,7 @@ document.addEventListener("keydown", (e) => {
       }
     }
   });
+
 
   /**
    * Effacement dynamique des erreurs
