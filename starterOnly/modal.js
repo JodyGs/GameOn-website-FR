@@ -1,3 +1,9 @@
+// TODO: Remonter erreur CGU
+// Validateur HTML
+// Modale validée
+// Version mobile front
+// reset sur buttonClose
+
 function editNav() {
   var x = document.getElementById("myTopnav");
   if (x.className === "topnav") {

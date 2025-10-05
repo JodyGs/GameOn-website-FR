@@ -482,11 +482,31 @@ footer {
   .hero-section {
     display: block;
     box-shadow: unset;
+    min-height: 0;
+
   }
+
+  .topnav {
+    width: 85%;
+    display: flex;
+    justify-content: space-between;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .fa-bars{
+    color: #ff001B;
+  }
+
+  .header-logo img{
+      max-width: 103px;
+  }
+
   .hero-content {
     background: #fff;
     color: #000;
-    padding: 20px;
+    padding: 0;
+    min-width: 0;
   }
   .hero-content::after {
     content: unset;
@@ -495,12 +515,13 @@ footer {
     display: none;
   }
   .hero-headline {
-    font-size: 4.5rem;
+    font-size: 40px;
     white-space: normal;
   }
   .hero-text {
+    margin-top: 20px;
     width: unset;
-    font-size: 1.5rem;
+    font-size: 13px;
   }
   .hero-img img {
     border-radius: 10px;
@@ -512,7 +533,7 @@ footer {
     padding: 12px 35px;
   }
   .copyrights {
-    margin-top: 50px;
+    margin-top: 0;
     text-align: center;
   }
 }
